@@ -1,29 +1,22 @@
 package com.project.move_up_web.controllers;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.project.move_up_web.dtos.UserRegisterDto;
+import com.project.move_up_web.services.AccountDetailsService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin("*")
-//@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
-    @GetMapping("/welcome")
-    public String welcome() {
-        return "Hello";
-    }
 
-//    @GetMapping("/user/userProfile")
-//    @PreAuthorize("hasRole('USER')")  // Use hasRole for role-based access control
-//    public String userProfile() {
-//        return "Welcome to User Profile";
-//    }
-//
-//    @GetMapping("/admin/adminProfile")
-//    @PreAuthorize("hasRole('ADMIN')")  // Use hasRole for role-based access control
-//    public String adminProfile() {
-//        return "Welcome to Admin Profile";
-//    }
+    @Autowired
+    private AccountDetailsService accountDetailsService;
+
+    @PostMapping("/register")
+    public ResponseEntity<Object> register(@Valid @RequestBody UserRegisterDto userRegisterDto) {
+        return ResponseEntity.ok(accountDetailsService.registerUser(userRegisterDto));
+    }
 }

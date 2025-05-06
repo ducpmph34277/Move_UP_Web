@@ -1,13 +1,14 @@
-package com.project.move_up_web.dtos;
+package com.project.move_up_web.dtos.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UserRegisterDto {
+public class UserRegisterRequest {
   @Email(message = "Invalid email")
   @NotBlank(message = "Email can't be blanked")
   private String email;
@@ -19,6 +20,6 @@ public class UserRegisterDto {
   private String password;
   @NotBlank(message = "Status can't be blanked")
   private String status;
-  @NotBlank(message = "Role can't be blanked")
+  @NotNull(message = "Role can't be blanked")
   private Long roleId;
 }

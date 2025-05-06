@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
-public class Users extends PrimaryId implements UserDetails {
+public class User extends PrimaryId implements UserDetails {
     @Column(name = "email")
     private String email;
     @Column(name = "fullName")
@@ -35,12 +35,16 @@ public class Users extends PrimaryId implements UserDetails {
     @JsonIgnoreProperties(value = {"createAt", "updateAt", "createBy", "updateBy"})
     @ManyToOne
     @JoinColumn(name = "roleId")
-    private Roles role;
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (role == null || role.getRoleName() == null) {
+            return List.of();
+        }
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
     }
+
 
     @Override
     public String getUsername() {
@@ -64,6 +68,7 @@ public class Users extends PrimaryId implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return "Active".equalsIgnoreCase(this.status);
     }
+
 }

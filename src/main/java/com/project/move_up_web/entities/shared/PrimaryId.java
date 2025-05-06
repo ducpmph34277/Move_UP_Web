@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class PrimaryId {
+public abstract class PrimaryId extends BaseEntities{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

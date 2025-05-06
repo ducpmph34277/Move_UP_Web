@@ -1,6 +1,6 @@
 package com.project.move_up_web.controllers;
 
-import com.project.move_up_web.dtos.UserRegisterDto;
+import com.project.move_up_web.dtos.requests.UserRegisterRequest;
 import com.project.move_up_web.services.AccountDetailsService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class AuthController {
     private AccountDetailsService accountDetailsService;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@Valid @RequestBody UserRegisterDto userRegisterDto) {
-        return ResponseEntity.ok(accountDetailsService.registerUser(userRegisterDto));
+    public ResponseEntity<Object> register(@Valid @RequestBody UserRegisterRequest userRegisterRequest) {
+        return ResponseEntity.ok(accountDetailsService.registerUser(userRegisterRequest));
     }
 }

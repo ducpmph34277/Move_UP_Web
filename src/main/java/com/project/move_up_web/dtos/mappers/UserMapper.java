@@ -1,10 +1,25 @@
 package com.project.move_up_web.dtos.mappers;
 
-import com.project.move_up_web.dtos.UserRegisterDto;
-import com.project.move_up_web.entities.Users;
+import com.project.move_up_web.dtos.requests.UserRegisterRequest;
+import com.project.move_up_web.dtos.helpers.RolesMapperHelper;
+import com.project.move_up_web.dtos.responses.UserListResponse;
+import com.project.move_up_web.entities.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = RolesMapperHelper.class)
 public interface UserMapper {
-  Users fromRegisterDto(UserRegisterDto userRegisterDto);
+
+  UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+  @Mapping(target = "role", source = "roleId", qualifiedByName = "mapRoleFromId")
+  User fromRegisterDto(UserRegisterRequest userRegisterRequest);
+
+  @Mapping(source = "role.roleName", target = "roleName")
+  UserListResponse toUserListResponse(User user);
+
+  List<UserListResponse> toUserListResponse(List<User> users);
 }

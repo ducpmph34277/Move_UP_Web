@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "roles")
-public class Roles extends PrimaryId {
+public class Role extends PrimaryId {
   @Column(name = "roleName")
   private String roleName;
   @Column(name = "status")

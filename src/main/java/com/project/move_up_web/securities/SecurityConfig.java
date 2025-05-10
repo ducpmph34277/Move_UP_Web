@@ -1,13 +1,13 @@
-package com.project.move_up_web.configs;
+package com.project.move_up_web.securities;
 
 import com.project.move_up_web.services.AccountDetailsService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,6 +30,9 @@ public class SecurityConfig {
 
   @Autowired
   private AccountDetailsService accountDetailsService;
+
+  @Autowired
+  private JwtFilter jwtFilter;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -44,11 +48,17 @@ public class SecurityConfig {
   }
 
   @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+  }
+
+  @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedMethods(Arrays.asList("GET", "PUT", "POST", "DELETE", "OPTIONS"));
     configuration.addAllowedOrigin("*");
     configuration.addAllowedHeader("*");
+    configuration.setAllowCredentials(true);
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
@@ -60,24 +70,13 @@ public class SecurityConfig {
       .csrf(AbstractHttpConfigurer::disable)
       .cors(cors -> cors.configurationSource(corsConfigurationSource()))
       .authorizeHttpRequests(auth -> auth
+        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
         .requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
-        .anyRequest().permitAll()
+        .anyRequest().authenticated()
       )
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      .httpBasic(Customizer.withDefaults())
-      .exceptionHandling(ex -> ex
-        .authenticationEntryPoint((request, response, authException) -> {
-          response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-          response.setContentType("application/json");
-          response.getWriter().write("{\"message\": \"Unauthorized: Invalid credentials\"}");
-        })
-        .accessDeniedHandler((request, response, accessDeniedException) -> {
-          response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
-          response.setContentType("application/json");
-          response.getWriter().write("{\"message\": \"Access Denied: You don't have the required role\"}");
-        })
-      );
-
+      .authenticationProvider(authenticationProvider())
+      .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 }

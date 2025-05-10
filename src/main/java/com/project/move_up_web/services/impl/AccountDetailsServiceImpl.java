@@ -1,13 +1,18 @@
 package com.project.move_up_web.services.impl;
 
+import com.project.move_up_web.dtos.requests.UserLoginRequest;
 import com.project.move_up_web.dtos.requests.UserRegisterRequest;
 import com.project.move_up_web.dtos.mappers.UserMapper;
+import com.project.move_up_web.dtos.responses.UserInfoResponse;
 import com.project.move_up_web.entities.Role;
 import com.project.move_up_web.entities.User;
 import com.project.move_up_web.repositories.RoleRepository;
 import com.project.move_up_web.repositories.UserRepository;
+import com.project.move_up_web.securities.JwtService;
 import com.project.move_up_web.services.AccountDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,13 +31,15 @@ public class AccountDetailsServiceImpl implements AccountDetailsService {
   @Autowired
   private UserMapper userMapper;
 
+  @Autowired
+  private JwtService jwtService;
+
   private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
   @Override
   public UserDetailsService userDetailsService() {
     return username -> userRepository.findByEmail(username)
       .orElseThrow(() -> {
-        System.out.println("User not found");
         return new UsernameNotFoundException("User not found");
       });
   }
@@ -46,4 +53,8 @@ public class AccountDetailsServiceImpl implements AccountDetailsService {
     user.setRole(role);
     return userRepository.save(user);
   }
+
+//  public String login(UserLoginRequest userLoginRequest) {
+//
+//  }
 }

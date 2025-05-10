@@ -1,10 +1,16 @@
 package com.project.move_up_web.controllers;
 
+import com.project.move_up_web.dtos.requests.UserLoginRequest;
 import com.project.move_up_web.dtos.requests.UserRegisterRequest;
+import com.project.move_up_web.entities.User;
+import com.project.move_up_web.repositories.UserRepository;
 import com.project.move_up_web.services.AccountDetailsService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,10 +19,32 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
+    private UserRepository userRepository;
+
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+    @Autowired
     private AccountDetailsService accountDetailsService;
 
     @PostMapping("/register")
     public ResponseEntity<Object> register(@Valid @RequestBody UserRegisterRequest userRegisterRequest) {
         return ResponseEntity.ok(accountDetailsService.registerUser(userRegisterRequest));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Object> login (@Valid @RequestBody UserLoginRequest userLoginRequest) {
+        System.out.println("Email: " + userLoginRequest.getEmail());
+        System.out.println("Password: " + userLoginRequest.getPassword());
+        User user = userRepository.findByEmail(userLoginRequest.getEmail()).orElse(null);
+        if(user == null) {
+            throw new UsernameNotFoundException("Email không chính xác, vui lòng kiểm tra lại");
+        }
+
+        if(!encoder.matches(userLoginRequest.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Sai mật khẩu, vui lòng thử lại");
+        }
+
+        return ResponseEntity.ok(user);
+//        return ResponseEntity.ok(accountDetailsService.login(userLoginRequest));
     }
 }

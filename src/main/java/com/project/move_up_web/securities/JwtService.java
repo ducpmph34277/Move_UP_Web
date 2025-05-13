@@ -1,6 +1,6 @@
 package com.project.move_up_web.securities;
 
-import com.project.move_up_web.dtos.responses.UserInfoResponse;
+import com.project.move_up_web.entities.Users;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -36,14 +36,14 @@ public class JwtService {
     return Keys.hmacShaKeyFor(key);
   }
 
-  public String generateToken(UserInfoResponse userInfoResponse) {
+  public String generateToken(Users users) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("id", userInfoResponse.getId());
-    claims.put("email", userInfoResponse.getEmail());
+    claims.put("id", users.getId());
+    claims.put("email", users.getEmail());
     return Jwts.builder()
       .claims()
       .add(claims)
-      .subject(userInfoResponse.getEmail())
+      .subject(users.getEmail())
       .issuedAt(new Date(System.currentTimeMillis()))
       .expiration(new Date(System.currentTimeMillis() + 604800 * 1000))
       .and().signWith(getKey()).compact();

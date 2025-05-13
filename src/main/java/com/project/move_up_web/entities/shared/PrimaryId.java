@@ -10,6 +10,5 @@ import lombok.Setter;
 public abstract class PrimaryId extends BaseEntities{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 }

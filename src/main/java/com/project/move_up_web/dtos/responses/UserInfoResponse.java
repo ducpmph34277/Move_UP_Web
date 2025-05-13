@@ -9,9 +9,13 @@ import java.time.LocalDateTime;
 @Setter
 public class UserInfoResponse {
   private Long id;
+  private String userId;
   private String email;
+  private String avatar;
   private String fullName;
   private String phoneNumber;
+  private Boolean gender;
+  private LocalDateTime dateOfBirth;
   private String roleName;
   private String status;
   private LocalDateTime createdAt;

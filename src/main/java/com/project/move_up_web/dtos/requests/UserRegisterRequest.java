@@ -21,5 +21,5 @@ public class UserRegisterRequest {
   @NotBlank(message = "Status can't be blanked")
   private String status;
   @NotNull(message = "Role can't be blanked")
-  private Long roleId;
+  private String roleName;
 }

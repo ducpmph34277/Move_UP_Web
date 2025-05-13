@@ -70,10 +70,10 @@ public class SecurityConfig {
       .csrf(AbstractHttpConfigurer::disable)
       .cors(cors -> cors.configurationSource(corsConfigurationSource()))
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
         .requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
-        .anyRequest().authenticated()
-      )
+        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+        .requestMatchers("/welcome").permitAll()
+        .anyRequest().authenticated())
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       .authenticationProvider(authenticationProvider())
       .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

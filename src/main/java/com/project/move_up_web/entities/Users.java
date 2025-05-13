@@ -1,6 +1,6 @@
 package com.project.move_up_web.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.project.move_up_web.configs.RolesEnum;
 import com.project.move_up_web.entities.shared.PrimaryId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,31 +21,36 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
-public class User extends PrimaryId implements UserDetails {
+public class Users extends PrimaryId implements UserDetails {
+    @Column(name = "userId")
+    private String userId;
     @Column(name = "email")
     private String email;
+    @Column(name = "password")
+    private String password;
+    @Column(name = "avatar")
+    private String avatar;
     @Column(name = "fullName")
     private String fullName;
     @Column(name = "phoneNumber")
     private String phoneNumber;
-    @Column(name = "password")
-    private String password;
+    @Column(name = "gender")
+    private Boolean gender;
+    @Column(name = "dateOfBirth")
+    private LocalDateTime dateOfBirth;
+    @Column(name = "roleName")
+    private String roleName;
     @Column(name = "status")
     private String status;
 
-    @JsonIgnoreProperties(value = {"createAt", "updateAt", "createBy", "updateBy"})
-    @ManyToOne
-    @JoinColumn(name = "roleId")
-    private Role role;
+    @Transient
+    @Enumerated(EnumType.STRING)
+    private RolesEnum role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (role == null || role.getRoleName() == null) {
-            return List.of();
-        }
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
-
 
     @Override
     public String getUsername() {
@@ -70,5 +76,4 @@ public class User extends PrimaryId implements UserDetails {
     public boolean isEnabled() {
         return "Active".equalsIgnoreCase(this.status);
     }
-
 }

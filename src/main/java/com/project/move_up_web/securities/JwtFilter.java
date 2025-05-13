@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,8 +26,9 @@ public class JwtFilter extends OncePerRequestFilter {
   private AccountDetailsService accountDetailsService;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-    throws ServletException, IOException {
+  protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                  @NonNull HttpServletResponse response,
+                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
     String authHeader = request.getHeader("Authorization");
     String token = null;
     String email = null;
@@ -49,12 +51,19 @@ public class JwtFilter extends OncePerRequestFilter {
         }
       }
     } catch (Exception ex) {
-      // You can log the exception here or handle it based on your needs
-      System.out.println("JWT Filter Error: " + ex.getMessage());
-      // Optionally: clear context in case of exception
+      // Log the exception
+      logger.error("JWT Filter Error: ", ex);
+
+      // Optionally, clear the context in case of an invalid or expired token
       SecurityContextHolder.clearContext();
+
+      // Optionally, set a response status code (e.g., 401 Unauthorized)
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.getWriter().write("Invalid token or unauthorized access.");
+      return; // Prevent further processing in case of error
     }
 
+    // Continue the filter chain if everything is fine
     filterChain.doFilter(request, response);
   }
 }

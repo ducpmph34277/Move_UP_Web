@@ -39,17 +39,14 @@ public class Users extends PrimaryId implements UserDetails {
     @Column(name = "dateOfBirth")
     private LocalDateTime dateOfBirth;
     @Column(name = "roleName")
-    private String roleName;
+    @Enumerated(EnumType.STRING)
+    private RolesEnum roleName;
     @Column(name = "status")
     private String status;
 
-    @Transient
-    @Enumerated(EnumType.STRING)
-    private RolesEnum role;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + roleName.name()));
     }
 
     @Override
